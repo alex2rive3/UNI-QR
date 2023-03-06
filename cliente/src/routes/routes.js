@@ -3,6 +3,7 @@ import Layout from "../layouts/Layouts";
 import Login from "../components/Login";
 import GeneradorQR from "../components/GeneradorQR";
 import NotFound from "../pages/NotFound";
+import Scaner from "../components/Scaner";
 
 export default createBrowserRouter([
     {
@@ -15,8 +16,12 @@ export default createBrowserRouter([
                 element: <Login />,
             },
             {
-                path: "generador",
+                path: "generar",
                 element: <GeneradorQR />,
+            },
+            {
+                path: "scaner",
+                element: <Scaner />,
             },
         ],
     },

@@ -1,9 +1,10 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-
+import axios from "axios";
 const validationSchema = yup.object({
     email: yup
         .string("Enter your email")
@@ -16,17 +17,48 @@ const validationSchema = yup.object({
 });
 
 const Login = () => {
-    const formik = useFormik({
-        initialValues: {
-            email: "foobar@example.com",
-            password: "foobar",
-        },
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2));
-        },
-    });
+    const navigate = useNavigate();
+    const valorInicial = {
+        email: "foobar@example.com",
+        password: "foobar",
+    };
 
+    const handleLogin = async (values, action) => {
+        const { email } = values;
+        //console.log(email);
+        try {
+            const res = await axios.post(
+                "http://localhost:8000/api/login",
+                values
+            );
+            //console.log(res);
+            if (res.status === 200) {
+                const result = await axios.post(
+                    "http://localhost:8000/api/user",
+                    {
+                        email: email,
+                    }
+                );
+                const direccion = result.data.permit;
+                if (direccion === "uni") {
+                    navigate("generar");
+                } else if (direccion === "guarda") {
+                    navigate("scaner");
+                } else {
+                    console.log("Administrador");
+                }
+            }
+            action.resetForm(valorInicial);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const formik = useFormik({
+        initialValues: valorInicial,
+        validationSchema: validationSchema,
+        enableReinitialize: "true",
+        onSubmit: handleLogin,
+    });
     return (
         <div style={{ width: "40%", margin: "80px auto", height: "350px" }}>
             <form
@@ -69,7 +101,7 @@ const Login = () => {
                     fullWidth
                     type="submit"
                 >
-                    Submit
+                    Iniciar Session
                 </Button>
             </form>
         </div>
